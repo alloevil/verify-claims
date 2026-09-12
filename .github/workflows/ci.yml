@@ -1,0 +1,54 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (py${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Unit tests (no dependencies)
+        run: python3 -m unittest discover -s tests -t .
+
+  claims:
+    name: this repo's own claims
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run the claims gate
+        run: python3 -m verify_claims --root . run
+      - name: The gate must fail on a drifted number
+        run: |
+          set -euo pipefail
+          cp example/data.json /tmp/data.json.orig
+          trap 'cp /tmp/data.json.orig example/data.json' EXIT
+          python3 - <<'PY'
+          import json, pathlib
+          p = pathlib.Path("example/data.json")
+          d = json.loads(p.read_text())
+          d["restaurants"] += 1          # silently "improve" a published figure
+          p.write_text(json.dumps(d, indent=2) + "\n")
+          PY
+          if python3 -m verify_claims --root example run >/tmp/drift.txt 2>&1; then
+            echo "::error::the claims gate passed although a published number no longer reproduces"
+            exit 1
+          fi
+          echo "gate correctly failed on the drifted number:"
+          grep -E "FAIL|failed" /tmp/drift.txt | head -3

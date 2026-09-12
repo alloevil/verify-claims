@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="vc-title vc-desc">
+  <title id="vc-title">verify-claims — run the receipts behind a claims.json file</title>
+  <desc id="vc-desc">verify-claims reads a claims.json file in which every published number carries the command that produced it, runs those commands, and fails when the output no longer matches. The panel on the right shows this repository's own run: seven machine-checked claims, seven ok. The footer gives the run's date.</desc>
+
+  <rect width="1200" height="420" fill="#0B0F14"/>
+  <rect x="0.5" y="0.5" width="1199" height="419" rx="18" fill="none" stroke="#1B232C"/>
+
+  <g id="identity" transform="translate(56 44)">
+    <text x="0" y="0" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" letter-spacing="2" fill="#8B949E">MIT &#183; PYTHON 3.9+ &#183; NO DEPENDENCIES</text>
+    <text x="0" y="86" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="72" font-weight="700" fill="#E6EDF3">verify-claims</text>
+
+    <g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="21" fill="#C9D1D9">
+      <text x="0" y="140">Runs the receipts behind a claims.json file:</text>
+      <text x="0" y="170">every published number must still be printed by</text>
+      <text x="0" y="200">the command next to it.</text>
+    </g>
+
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18">
+      <rect x="0" y="228" width="120" height="38" rx="9" fill="#141B23" stroke="#26313C"/>
+      <text x="16" y="253" fill="#C9D1D9">claims.json</text>
+      <rect x="134" y="228" width="106" height="38" rx="9" fill="#141B23" stroke="#26313C"/>
+      <text x="150" y="253" fill="#C9D1D9">check.cmd</text>
+      <rect x="254" y="228" width="120" height="38" rx="9" fill="#0E1B12" stroke="#2B5A38"/>
+      <text x="270" y="253" fill="#3FB950">expect</text>
+      <rect x="388" y="228" width="92" height="38" rx="9" fill="#141B23" stroke="#26313C"/>
+      <text x="404" y="253" fill="#C9D1D9">as_of</text>
+    </g>
+
+    <text x="0" y="308" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="19" fill="#8B949E">A number with no command that reproduces it is a rumour.</text>
+    <text x="0" y="342" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#8B949E">this repository's own gate: 7 machine-checked &#183; 7 ok</text>
+  </g>
+
+  <g id="run-panel">
+    <rect x="620" y="44" width="524" height="328" rx="16" fill="#141B23" stroke="#26313C" stroke-width="1.5"/>
+
+    <text x="644" y="80" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#8B949E">$ verify-claims --root . run</text>
+
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C9D1D9">
+      <text x="644" y="118"><tspan fill="#3FB950">ok</tspan>   zero-dependencies</text>
+      <text x="644" y="146"><tspan fill="#3FB950">ok</tspan>   example-passes</text>
+      <text x="644" y="174"><tspan fill="#3FB950">ok</tspan>   strict-mode-bites</text>
+      <text x="644" y="202"><tspan fill="#3FB950">ok</tspan>   test-count</text>
+    </g>
+
+    <line x1="644" y1="228" x2="1120" y2="228" stroke="#26313C"/>
+
+    <text x="644" y="258" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C9D1D9">7 machine-checked &#183; 7 ok &#183; 0 failed &#183; 0 manual</text>
+    <text x="644" y="286" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#3FB950">passed &#8212; every published number reproduced.</text>
+    <text x="644" y="320" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#8B949E">a drifted number instead prints</text>
+    <text x="644" y="346" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#F85149">expected '283312', got '284312'</text>
+  </g>
+</svg>

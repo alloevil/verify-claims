@@ -1,0 +1,58 @@
+name: verify-claims
+description: >-
+  Run the receipts in a claims.json file: every published number must still be
+  produced by the command next to it, or the job fails.
+author: alloevil
+branding:
+  icon: check-circle
+  color: green
+
+inputs:
+  root:
+    description: Repository root the claim commands run in
+    required: false
+    default: "."
+  file:
+    description: Path to the claims file (defaults to claims.json / docs/claims.json / dist/claims.json)
+    required: false
+    default: ""
+  strict:
+    description: '"true" also fails on claims marked manual (numbers no command checks)'
+    required: false
+    default: "false"
+  python-version:
+    description: Python used to run the tool
+    required: false
+    default: "3.12"
+
+outputs:
+  summary:
+    description: One-line summary (e.g. "5 machine-checked · 5 ok · 0 failed · 1 manual")
+    value: ${{ steps.run.outputs.summary }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    # No install step: the action runs the tool from its own checkout via PYTHONPATH.
+    # Nothing is published to a registry that could lag the ref you pinned.
+    - name: Run the claim checks
+      id: run
+      shell: bash
+      env:
+        ROOT: ${{ inputs.root }}
+        CLAIMS_FILE: ${{ inputs.file }}
+        STRICT: ${{ inputs.strict }}
+      run: |
+        set -uo pipefail
+        args=(--root "$ROOT" run)
+        if [ -n "$CLAIMS_FILE" ]; then args+=(-f "$CLAIMS_FILE"); fi
+        if [ "$STRICT" = "true" ]; then args+=(--strict); fi
+        PYTHONPATH="$GITHUB_ACTION_PATH${PYTHONPATH:+:$PYTHONPATH}" python3 -m verify_claims "${args[@]}" | tee "$RUNNER_TEMP/verify-claims.txt"
+        status=${PIPESTATUS[0]}
+        summary=$(grep -E 'machine-checked ·' "$RUNNER_TEMP/verify-claims.txt" | sed 's/^ *//' | tail -1)
+        echo "summary=${summary:-no summary}" >> "$GITHUB_OUTPUT"
+        exit "$status"

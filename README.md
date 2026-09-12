@@ -1,0 +1,123 @@
+# verify-claims
+
+<p align="center">
+  <img src="./assets/readme/hero.svg" width="100%" alt="verify-claims — runs the receipts behind a claims.json file: every published number must still be printed by the command next to it. The panel shows this repository's own run: 7 machine-checked, 7 ok.">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/python-3.9%2B-blue.svg" alt="Python 3.9+">
+  <img src="https://img.shields.io/badge/dependencies-none-brightgreen.svg" alt="Dependencies: none">
+  <img src="https://img.shields.io/badge/license-MIT-00ccff.svg" alt="License">
+</p>
+
+**The problem this exists for.** A README says "283 restaurants and 312 visits", a dashboard says "6,395 records across 89 benchmarks", a changelog says "167 releases". Six months later the number is wrong, and nothing failed — because the number was written by hand into prose while the data moved underneath it. A claim with no command behind it is not evidence, it is a rumour that happens to be formatted.
+
+`verify-claims` makes the command part of the claim. A `claims.json` file lists every published number with the command that produces it and what that command's output must contain. The tool runs them; if the output no longer matches, the job fails.
+
+## The format
+
+```jsonc
+{
+  "project": "foodmap",
+  "updated": "2026-09-13",
+  "claims": [
+    {
+      "id": "dataset-size",
+      "claim": "The repository ships 283 restaurants and 312 visits.",
+      "value": "283 restaurants / 312 visits",
+      "metric": "counts read from data/*/restaurants.json",
+      "method": "node counts the two files and prints the two totals",
+      "repro": "node -e \"...\"",
+      "evidence": "data/陈晓卿/restaurants.json",
+      "as_of": "2026-09-13",
+
+      "check": {
+        "cmd": "node -e \"...\"",          // string or list (setup steps, then the one that prints)
+        "expect": { "equals": "283 312" }, // equals | contains | not_contains | regex | exit_code
+        "timeout": 60,                     // seconds, default 120
+        "dir": "scripts"                   // optional, relative to --root
+      }
+    },
+    {
+      "id": "live-site-shows-the-same-number",
+      "claim": "The deployed page shows the same total.",
+      "value": "same as data.json",
+      "metric": "the rendered page",
+      "method": "requires fetching the deployment",
+      "repro": "curl -s https://example.invalid/",
+      "evidence": "https://example.invalid/",
+      "as_of": "2026-09-13",
+
+      "check": { "manual": "needs network access to the deployed page; the deploy job checks it, not this one" }
+    }
+  ]
+}
+```
+
+Rules the tool enforces, and nothing else:
+
+- **A claim must say how it can be checked** — either `check.cmd` + `check.expect`, or `check.manual` with a written reason. Neither is a shape error, and a file with shape errors refuses to run (exit 2) instead of reporting a green tick.
+- **One of `as_of` / `verified` / `updated`** per claim: the date the number was last true for. A number without a date cannot be judged stale.
+- **Unknown extra keys are tolerated.** A standard that rejects harmless extras does not get adopted.
+
+The shape is taken from the claims files already used across [codeblast](https://github.com/alloevil/codeblast), [paired-eval](https://github.com/alloevil/paired-eval), [foodmap](https://github.com/alloevil/foodmap), [deepresearch-arms-lab](https://github.com/alloevil/deepresearch-arms-lab) and [github-discovery](https://github.com/alloevil/github-discovery) — the same fields, with the executable part added.
+
+## Use it
+
+```bash
+# from this repo
+python3 -m verify_claims --root . run
+
+# or install it
+pip install "git+https://github.com/alloevil/verify-claims@v0.1.0"
+verify-claims --root . run
+
+verify-claims --root . list     # which claims are machine-checked, which are manual
+verify-claims --root . check    # shape only, runs nothing
+```
+
+Exit codes: **0** every machine check passed · **1** a claim no longer reproduces (or, with `--strict`, a claim has no machine check) · **2** the file's shape is invalid, so nothing was run.
+
+Options: `--strict` · `--json` · `--timeout` · `--only id1,id2` · `--skip id1` · `-f path/to/claims.json` (the default search order is `claims.json`, `docs/claims.json`, `.claims/claims.json`, `dist/claims.json`).
+
+### As a GitHub Action
+
+```yaml
+- uses: actions/checkout@v4
+- uses: alloevil/verify-claims@v0.1.0
+  with:
+    strict: "false"     # "true" also fails on claims that no command checks
+```
+
+The action runs the tool from its own checkout (`PYTHONPATH`), so nothing is installed from a registry that could lag the ref you pinned. Output `summary` carries the one-line result.
+
+## What a failure looks like
+
+```
+$ python3 -m verify_claims --root example run      # after example/data.json changed behind the claim
+  ok   ... (other claims)
+  FAIL dataset-size                     [fail] equals: expected '283312', got '284312'
+  1 machine-checked · 0 ok · 1 failed · 0 error · 1 manual
+  FAILED — a published number no longer reproduces; fix the number or the code, not the gate.
+```
+
+The gate never rewrites your text. It tells you which published number stopped being true, and leaves the choice between fixing the number, fixing the code, or marking the claim manual with a reason.
+
+## This repository checks itself
+
+`claims.json` at the repository root states seven claims about this tool — that it has no dependencies, that the CLI exposes the documented subcommands, that the version matches the manifest, that the example passes, that `--strict` really fails on a manual claim, that the shape validator refuses a claim with no check, and that the test suite has the number of tests the file says. CI runs that file, then deliberately breaks a number and requires the run to fail.
+
+```
+$ python3 -m verify_claims --root . run
+7 machine-checked · 7 ok · 0 failed · 0 error · 0 manual
+```
+
+## Scope
+
+- It does not scrape text for numbers, and it does not judge whether a claim is meaningful. It runs what you wrote down, and reports what happened.
+- It does not replace a test suite: a claim check is a receipt for a published number, not a unit test.
+- Commands run with your shell and your environment, in the repository you point it at. Read a claims file before you run it, exactly as you would a Makefile.
+
+## License
+
+MIT

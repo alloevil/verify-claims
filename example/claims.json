@@ -1,0 +1,33 @@
+{
+  "project": "example",
+  "updated": "2026-09-13",
+  "claims": [
+    {
+      "id": "dataset-size",
+      "claim": "The example ships 283 restaurants and 312 visits.",
+      "value": "283 restaurants / 312 visits",
+      "metric": "counts read from example/data.json",
+      "method": "example/show.py prints the two numbers concatenated, and this claim asserts that output",
+      "repro": "python3 example/show.py",
+      "evidence": "example/data.json",
+      "as_of": "2026-09-13",
+      "check": {
+        "cmd": "python3 show.py",
+        "expect": { "equals": "283312" }
+      }
+    },
+    {
+      "id": "live-site-shows-the-same-numbers",
+      "claim": "The published page shows the same two numbers.",
+      "value": "same as data.json",
+      "metric": "the rendered page",
+      "method": "requires fetching the deployed site",
+      "repro": "curl -s https://example.invalid/ | grep -o '283\\|312'",
+      "evidence": "https://example.invalid/",
+      "as_of": "2026-09-13",
+      "check": {
+        "manual": "needs network access to the deployed page; the deployment gate in that repository checks it, not this one"
+      }
+    }
+  ]
+}

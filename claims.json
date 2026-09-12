@@ -1,0 +1,109 @@
+{
+  "project": "verify-claims",
+  "url": "https://github.com/alloevil/verify-claims",
+  "repository": "https://github.com/alloevil/verify-claims",
+  "updated": "2026-09-13",
+  "claims": [
+    {
+      "id": "zero-dependencies",
+      "claim": "The tool installs nothing: it runs on the Python standard library alone.",
+      "value": "0 runtime dependencies",
+      "metric": "entries in pyproject.toml's `dependencies` list",
+      "method": "the package imports only json, argparse, subprocess, pathlib, re, time; pyproject declares an empty dependency list",
+      "repro": "grep -n '^dependencies' pyproject.toml",
+      "evidence": "pyproject.toml",
+      "as_of": "2026-09-13",
+      "check": {
+        "cmd": "grep -q '^dependencies = \\[\\]$' pyproject.toml && echo 'zero deps'",
+        "expect": { "contains": ["zero deps"] }
+      }
+    },
+    {
+      "id": "cli-subcommands",
+      "claim": "The CLI exposes run, check and list.",
+      "value": "3 subcommands",
+      "metric": "subcommands listed by --help",
+      "method": "argparse subparsers in verify_claims/cli.py",
+      "repro": "python3 -m verify_claims --help",
+      "evidence": "verify_claims/cli.py",
+      "as_of": "2026-09-13",
+      "check": {
+        "cmd": "python3 -m verify_claims --help; python3 -m verify_claims run --help",
+        "expect": { "contains": ["run", "check", "list", "strict"] }
+      }
+    },
+    {
+      "id": "version-matches-manifest",
+      "claim": "The version the package reports equals the version in pyproject.toml.",
+      "value": "0.1.0",
+      "metric": "verify_claims.__version__ vs pyproject version",
+      "method": "both are read and compared",
+      "repro": "python3 -c \"import verify_claims as v; print(v.__version__)\"",
+      "evidence": "verify_claims/__init__.py",
+      "as_of": "2026-09-13",
+      "check": {
+        "cmd": [
+          "python3 -c \"import tomllib,pathlib; print('manifest', tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])\" 2>/dev/null || python3 -c \"import re,pathlib; print('manifest', re.search(r'^version = \\\"([^\\\"]+)\\\"', pathlib.Path('pyproject.toml').read_text(), re.M).group(1))\"",
+          "python3 -c \"import verify_claims; print('manifest', verify_claims.__version__)\""
+        ],
+        "expect": { "regex": "^manifest \\d+\\.\\d+\\.\\d+$" }
+      }
+    },
+    {
+      "id": "example-passes",
+      "claim": "The example repository's claims all reproduce.",
+      "value": "1 machine-checked, 1 manual",
+      "metric": "counts printed by a run over example/",
+      "method": "the example reads example/data.json and prints its numbers; the claims file asserts that output",
+      "repro": "python3 -m verify_claims --root example run",
+      "evidence": "example/claims.json",
+      "as_of": "2026-09-13",
+      "check": {
+        "cmd": "python3 -m verify_claims --root example run",
+        "expect": { "contains": ["1 machine-checked · 1 ok", "passed"] }
+      }
+    },
+    {
+      "id": "strict-mode-bites",
+      "claim": "Strict mode turns a manual (unchecked) claim into a failed run.",
+      "value": "exit 1 with --strict, exit 0 without",
+      "metric": "process exit code",
+      "method": "the example carries one claim that no command can check; --strict must reject it",
+      "repro": "python3 -m verify_claims --root example run --strict; echo exit=$?",
+      "evidence": "verify_claims/checks.py",
+      "as_of": "2026-09-13",
+      "check": {
+        "cmd": "python3 -m verify_claims --root example run --strict >/dev/null 2>&1; echo exit=$?",
+        "expect": { "contains": ["exit=1"] }
+      }
+    },
+    {
+      "id": "shape-validator-rejects-a-claim-without-a-check",
+      "claim": "A claim with neither a command nor a written reason is refused, and the tool refuses to run such a file.",
+      "value": "exit 1 from `check`, exit 2 from `run`",
+      "metric": "process exit codes",
+      "method": "tests/fixtures/invalid/claims.json omits the check block on purpose",
+      "repro": "python3 -m verify_claims --root tests/fixtures/invalid check; python3 -m verify_claims --root tests/fixtures/invalid run; echo exit=$?",
+      "evidence": "tests/fixtures/invalid/claims.json",
+      "as_of": "2026-09-13",
+      "check": {
+        "cmd": "python3 -m verify_claims --root tests/fixtures/invalid run >/dev/null 2>&1; echo exit=$?",
+        "expect": { "contains": ["exit=2"] }
+      }
+    },
+    {
+      "id": "test-count",
+      "claim": "The test suite contains 24 tests.",
+      "value": "24",
+      "metric": "tests reported by the standard-library runner",
+      "method": "unittest discovery over tests/",
+      "repro": "python3 -m unittest discover -s tests -t .",
+      "evidence": "tests/test_verify_claims.py",
+      "as_of": "2026-09-13",
+      "check": {
+        "cmd": "python3 -m unittest discover -s tests -t . 2>&1 | grep -o '^Ran [0-9]* tests'",
+        "expect": { "equals": "Ran 24 tests" }
+      }
+    }
+  ]
+}

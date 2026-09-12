@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "verify-claims"
+version = "0.1.0"
+description = "Run the receipts behind a claims.json file: every published number carries a command that must still reproduce it."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "alloevil" }]
+keywords = ["reproducibility", "documentation", "evidence", "claims", "ci"]
+dependencies = []
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.urls]
+Homepage = "https://github.com/alloevil/verify-claims"
+
+[project.scripts]
+verify-claims = "verify_claims.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["verify_claims", "verify_claims.*"]

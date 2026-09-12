@@ -1,0 +1,16 @@
+{
+  "project": "invalid-fixture",
+  "updated": "2026-09-13",
+  "claims": [
+    {
+      "id": "no-check-on-purpose",
+      "claim": "This claim has neither a command nor a written reason, so the shape validator must refuse the file.",
+      "value": "42",
+      "metric": "nothing — that is the point",
+      "method": "used by the test suite and by this repository's own claims.json",
+      "repro": "python3 -m verify_claims --root tests/fixtures/invalid check",
+      "evidence": "tests/fixtures/invalid/claims.json",
+      "as_of": "2026-09-13"
+    }
+  ]
+}
