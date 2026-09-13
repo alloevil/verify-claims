@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Weekly, because this repository's own claims gate is the demonstration that the gate can
+  # fail: the schedule keeps that proof running even in weeks without a commit.
+  schedule:
+    - cron: "17 6 * * 1"
 
 permissions:
   contents: read

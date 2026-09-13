@@ -103,6 +103,19 @@ $ python3 -m verify_claims --root example run      # after example/data.json cha
 
 The gate never rewrites your text. It tells you which published number stopped being true, and leaves the choice between fixing the number, fixing the code, or marking the claim manual with a reason.
 
+## Releases
+
+`v0.1.0` · `v0.1.1` (a failed assertion now reports the command's actual output). Tags are the
+release unit — consumers reference `alloevil/verify-claims@vX.Y.Z`; there is no floating tag on
+purpose, because a moving ref would mean a gate that changes without a commit in the repository
+it guards.
+
+Publishing runs from `.github/workflows/release.yml` on a version tag, through PyPI Trusted
+Publishing (OIDC), so no API token lives in this repository. The workflow refuses a tag that does
+not match `pyproject.toml`, runs the tests and this repo's own claims first, and `twine check`s
+the artifacts before upload. One-time setup on PyPI: add a pending publisher for
+`alloevil/verify-claims`, workflow `release.yml`, environment `pypi`.
+
 ## This repository checks itself
 
 `claims.json` at the repository root states seven claims about this tool — that it has no dependencies, that the CLI exposes the documented subcommands, that the version matches the manifest, that the example passes, that `--strict` really fails on a manual claim, that the shape validator refuses a claim with no check, and that the test suite has the number of tests the file says. CI runs that file, then deliberately breaks a number and requires the run to fail.
