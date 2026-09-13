@@ -149,6 +149,23 @@
         },
         "timeout": 60
       }
+    },
+    {
+      "id": "measurement-totals",
+      "claim": "docs/measurement.md's per-repo table sums to its own stated totals: 16 repositories, 553 claims checked, 98 contradicted, 33 unsupported, 131 defective (24%).",
+      "value": "131 of 553 (24%)",
+      "metric": "the table's rows summed and compared with the total row, in the document itself",
+      "method": "the audit's per-repo verdicts were recorded per batch; this keeps the report's arithmetic honest if either the rows or the totals are edited",
+      "repro": "grep -c '^|' docs/measurement.md",
+      "evidence": "docs/measurement.md",
+      "as_of": "2026-09-13",
+      "check": {
+        "cmd": "python3 -c \"import re,pathlib;t=pathlib.Path('docs/measurement.md').read_text();rows=[r for r in re.findall(r'^\\|\\s*([^|*]+?)\\s*\\|\\s*(\\d+)\\s*\\|\\s*(\\d+)\\s*\\|\\s*(\\d+)\\s*\\|', t, re.M)];tot=re.findall(r'^\\|\\s*\\*\\*(\\d+) repositories\\*\\*\\s*\\|\\s*\\*\\*(\\d+)\\*\\*\\s*\\|\\s*\\*\\*(\\d+)\\*\\*\\s*\\|\\s*\\*\\*(\\d+)\\*\\*\\s*\\|', t, re.M)[0];s=[len(rows)]+[sum(int(r[i]) for r in rows) for i in (1,2,3)];d=s[2]+s[3];pct=round(100*d/s[1]);print('sums', *s, d, '| stated', *[int(x) for x in tot], int(tot[2])+int(tot[3]), '| pct', pct, '| doc says 24%:', '24%' in t)\"",
+        "expect": {
+          "regex": "^sums 16 553 98 33 131 \\| stated 16 553 98 33 131 \\| pct 24 \\| doc says 24%: True$"
+        },
+        "timeout": 60
+      }
     }
   ]
 }

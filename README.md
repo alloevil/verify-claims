@@ -125,6 +125,17 @@ $ python3 -m verify_claims --root . run
 7 machine-checked · 7 ok · 0 failed · 0 error · 0 manual
 ```
 
+## Where the numbers came from
+
+[**docs/measurement.md**](docs/measurement.md) is the audit this tool was built out of: 16
+repositories, **553 checkable claims, 131 of which did not stand up (24%)**, listed per repository
+with the worst finding and the commit that fixed it. It also records the ten checks I wrote wrongly
+while doing it — about one wrong check per thirteen wrong claims — and the limitations of the
+measurement (one auditor, not a random sample, softer verdicts excluded).
+
+The report's own arithmetic is a claim in this repository's `claims.json`: edit a row without
+editing the totals and the gate fails.
+
 ## What it catches, with real examples
 
 [**docs/case-studies.md**](docs/case-studies.md) collects the failure modes this tool was built from — every case is a number that was actually published in one of the author's repositories and did not stand up: a hardcoded star count inside the generator that re-renders it daily, a "daily cron" that never existed, a `--check` that failed every day without a rebuild, a link checker that excluded the directory holding the broken link, a `~20 s` estimate against a measured 71 s. It also records the five checks *I* wrote wrongly while writing it, and what caught each.
