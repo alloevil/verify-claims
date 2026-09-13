@@ -15,7 +15,11 @@
       "as_of": "2026-09-13",
       "check": {
         "cmd": "grep -q '^dependencies = \\[\\]$' pyproject.toml && echo 'zero deps'",
-        "expect": { "contains": ["zero deps"] }
+        "expect": {
+          "contains": [
+            "zero deps"
+          ]
+        }
       }
     },
     {
@@ -29,7 +33,14 @@
       "as_of": "2026-09-13",
       "check": {
         "cmd": "python3 -m verify_claims --help; python3 -m verify_claims run --help",
-        "expect": { "contains": ["run", "check", "list", "strict"] }
+        "expect": {
+          "contains": [
+            "run",
+            "check",
+            "list",
+            "strict"
+          ]
+        }
       }
     },
     {
@@ -46,7 +57,9 @@
           "python3 -c \"import tomllib,pathlib; print('manifest', tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])\" 2>/dev/null || python3 -c \"import re,pathlib; print('manifest', re.search(r'^version = \\\"([^\\\"]+)\\\"', pathlib.Path('pyproject.toml').read_text(), re.M).group(1))\"",
           "python3 -c \"import verify_claims; print('manifest', verify_claims.__version__)\""
         ],
-        "expect": { "regex": "^manifest \\d+\\.\\d+\\.\\d+$" }
+        "expect": {
+          "regex": "^manifest \\d+\\.\\d+\\.\\d+$"
+        }
       }
     },
     {
@@ -60,7 +73,12 @@
       "as_of": "2026-09-13",
       "check": {
         "cmd": "python3 -m verify_claims --root example run",
-        "expect": { "contains": ["1 machine-checked · 1 ok", "passed"] }
+        "expect": {
+          "contains": [
+            "1 machine-checked · 1 ok",
+            "passed"
+          ]
+        }
       }
     },
     {
@@ -74,7 +92,11 @@
       "as_of": "2026-09-13",
       "check": {
         "cmd": "python3 -m verify_claims --root example run --strict >/dev/null 2>&1; echo exit=$?",
-        "expect": { "contains": ["exit=1"] }
+        "expect": {
+          "contains": [
+            "exit=1"
+          ]
+        }
       }
     },
     {
@@ -88,7 +110,11 @@
       "as_of": "2026-09-13",
       "check": {
         "cmd": "python3 -m verify_claims --root tests/fixtures/invalid run >/dev/null 2>&1; echo exit=$?",
-        "expect": { "contains": ["exit=2"] }
+        "expect": {
+          "contains": [
+            "exit=2"
+          ]
+        }
       }
     },
     {
@@ -102,7 +128,26 @@
       "as_of": "2026-09-13",
       "check": {
         "cmd": "python3 -m unittest discover -s tests -t . 2>&1 | grep -o '^Ran [0-9]* tests'",
-        "expect": { "equals": "Ran 24 tests" }
+        "expect": {
+          "equals": "Ran 24 tests"
+        }
+      }
+    },
+    {
+      "id": "case-studies-count",
+      "claim": "docs/case-studies.md documents six failure modes (plus the section on wrongly written checks).",
+      "value": "6 modes",
+      "metric": "numbered `## ` headings in the document",
+      "method": "the document groups the audited failures by mode; this claim keeps the count honest",
+      "repro": "grep -c '^## [0-9]' docs/case-studies.md",
+      "evidence": "docs/case-studies.md",
+      "as_of": "2026-09-13",
+      "check": {
+        "cmd": "grep -c '^## [0-9]' docs/case-studies.md",
+        "expect": {
+          "equals": "6"
+        },
+        "timeout": 60
       }
     }
   ]

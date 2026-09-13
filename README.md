@@ -112,6 +112,10 @@ $ python3 -m verify_claims --root . run
 7 machine-checked · 7 ok · 0 failed · 0 error · 0 manual
 ```
 
+## What it catches, with real examples
+
+[**docs/case-studies.md**](docs/case-studies.md) collects the failure modes this tool was built from — every case is a number that was actually published in one of the author's repositories and did not stand up: a hardcoded star count inside the generator that re-renders it daily, a "daily cron" that never existed, a `--check` that failed every day without a rebuild, a link checker that excluded the directory holding the broken link, a `~20 s` estimate against a measured 71 s. It also records the five checks *I* wrote wrongly while writing it, and what caught each.
+
 ## Scope
 
 - It does not scrape text for numbers, and it does not judge whether a claim is meaningful. It runs what you wrote down, and reports what happened.
