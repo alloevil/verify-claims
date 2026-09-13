@@ -2,7 +2,7 @@
   "project": "verify-claims",
   "url": "https://github.com/alloevil/verify-claims",
   "repository": "https://github.com/alloevil/verify-claims",
-  "updated": "2026-09-13",
+  "updated": "2026-09-14",
   "claims": [
     {
       "id": "zero-dependencies",
@@ -24,21 +24,22 @@
     },
     {
       "id": "cli-subcommands",
-      "claim": "The CLI exposes run, check, list and coverage.",
-      "value": "4 subcommands",
+      "claim": "The CLI exposes run, check, list, coverage and index.",
+      "value": "5 subcommands",
       "metric": "subcommands listed by --help",
       "method": "argparse subparsers in verify_claims/cli.py",
       "repro": "python3 -m verify_claims --help",
       "evidence": "verify_claims/cli.py",
       "as_of": "2026-09-13",
       "check": {
-        "cmd": "python3 -m verify_claims --help; python3 -m verify_claims run --help; python3 -m verify_claims coverage --help",
+        "cmd": "python3 -m verify_claims --help; python3 -m verify_claims run --help; python3 -m verify_claims coverage --help; python3 -m verify_claims index --help",
         "expect": {
           "contains": [
             "run",
             "check",
             "list",
-            "coverage"
+            "coverage",
+            "index"
           ]
         }
       }
@@ -120,7 +121,7 @@
     {
       "id": "test-count",
       "claim": "The test suite contains 25 tests.",
-      "value": "30",
+      "value": "33",
       "metric": "tests reported by the standard-library runner",
       "method": "unittest discovery over tests/",
       "repro": "python3 -m unittest discover -s tests -t .",
@@ -129,7 +130,7 @@
       "check": {
         "cmd": "python3 -m unittest discover -s tests -t . 2>&1 | grep -o '^Ran [0-9]* tests'",
         "expect": {
-          "equals": "Ran 30 tests"
+          "equals": "Ran 33 tests"
         }
       }
     },
@@ -199,6 +200,23 @@
       "as_of": "2026-09-13",
       "check": {
         "manual": "Needs a sibling checkout of all 22 guarded repositories, so it cannot run in this repository's CI. Re-run the loop in `repro` and update the figure here and in docs/measurement.md together; the number is a heuristic backlog, and the document says so."
+      }
+    },
+    {
+      "id": "index-page-consistent",
+      "claim": "`docs/index.md` is generated, and its summary line always equals the sum of the rows under it — a hand-edited page would fail this.",
+      "value": "summary == sum(rows)",
+      "metric": "rows/claims/machine/manual parsed back out of the committed page",
+      "method": "`index_page.summarise` re-reads the rendered page: total must equal machine + manual, and the page must still carry the do-not-edit notice",
+      "repro": "PYTHONPATH=. python3 -c \"from verify_claims import index_page as i; print(i.summarise(open('docs/index.md').read()))\"",
+      "evidence": "docs/index.md",
+      "as_of": "2026-09-14",
+      "check": {
+        "cmd": "PYTHONPATH=. python3 -c \"from verify_claims import index_page as i;t=open('docs/index.md').read();r,tot,m,man=i.summarise(t);assert tot==m+man,(tot,m,man);assert r>0;assert 'do not edit by hand' in t;print('consistent',r,tot,m,man)\"",
+        "expect": {
+          "regex": "consistent \\d+ \\d+ \\d+ \\d+"
+        },
+        "timeout": 120
       }
     }
   ]

@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from verify_claims import checks, coverage, runner, schema  # noqa: E402
+from verify_claims import checks, coverage, index_page, runner, schema  # noqa: E402
 from verify_claims.cli import main  # noqa: E402
 
 PY = sys.executable
@@ -289,6 +289,32 @@ class CoverageTest(unittest.TestCase):
             (root / "claims.json").write_text(json.dumps(document(claim())), encoding="utf-8")
             code = main(["--root", str(root), "coverage"])
         self.assertEqual(code, 0, "coverage is a report; it never fails the build")
+
+
+class IndexPageTest(unittest.TestCase):
+    """The summary line must agree with the table under it — the page's own claim."""
+
+    def _row(self, name, total, manual, updated="2026-01-01"):
+        claims = [{"id": f"c{i}", "check": {"manual": "x"} if i < manual else {"cmd": "true"}}
+                  for i in range(total)]
+        return index_page.row_for(f"owner/{name}", {"claims": claims, "updated": updated})
+
+    def test_renders_a_row_per_repository_with_links(self):
+        text = index_page.render([self._row("alpha", 3, 1), self._row("beta", 2, 0)],
+                                 "2026-01-02", "test source")
+        self.assertIn("| [`alpha`](https://github.com/owner/alpha) | 3 | 2 | 1 | 2026-01-01 |", text)
+        self.assertIn("| [`beta`](https://github.com/owner/beta) | 2 | 2 | 0 | 2026-01-01 |", text)
+
+    def test_unreachable_repository_is_shown_not_dropped(self):
+        text = index_page.render([index_page.Row("gone", "o/gone", None, None, None, "-", "HTTPError")],
+                                 "2026-01-02", "test source")
+        self.assertIn("unreachable: HTTPError", text)
+
+    def test_summary_line_matches_the_table(self):
+        text = index_page.render([self._row("a", 3, 1), self._row("b", 4, 4)], "2026-01-02", "src")
+        rows, total, machine, manual = index_page.summarise(text)
+        self.assertEqual((rows, total, machine, manual), (2, 7, 2, 5))
+        self.assertIn("**Total** · 7 claims · 2 machine-checked · 5 manual", text)
 
 
 if __name__ == "__main__":

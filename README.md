@@ -75,6 +75,7 @@ verify-claims --root . run
 verify-claims --root . list     # which claims are machine-checked, which are manual
 verify-claims --root . check    # shape only, runs nothing
 verify-claims --root . coverage # which numbers in the README nothing claims (a to-do list)
+verify-claims --root . index    # one page covering every repository this guards
 ```
 
 Exit codes: **0** every machine check passed · **1** a claim no longer reproduces (or, with `--strict`, a claim has no machine check) · **2** the file's shape is invalid, so nothing was run.
@@ -110,6 +111,25 @@ So the output is an upper bound on the work left, ordered by where a reader look
 completeness score. Across the 22 repositories this tool guards it currently lists roughly one
 unclaimed candidate per claim — most of them the kind of decorative number above, which is why the
 number is reported as a backlog to be triaged rather than a defect count.
+
+### The portfolio page
+
+The gates live in 22 repositories, so "are your numbers checked?" is spread across 22 CI runs nobody
+opens. `index` reads each repository's own claims file (the list is `docs/repos.txt`) and renders one
+table: how many claims, how many machine-checked, how many still manual, and when that file was last
+updated. [`docs/index.md`](docs/index.md) is the current output.
+
+```bash
+verify-claims index --out docs/index.md            # from raw.githubusercontent.com at HEAD
+verify-claims index --ref v0.1.2 --out page.md     # pinned to one tag, so the page is reproducible
+verify-claims index --path ../ --out page.md       # from local clones, no network
+```
+
+It is regenerated weekly by `.github/workflows/index.yml` and is never hand-edited: a row comes from
+the repository it describes. A sibling that cannot be fetched shows up as `unreachable: <error>`
+instead of disappearing, because a dropped row would make the portfolio look smaller than it is. The
+page is not a gate — nothing fails when a repository is unreachable — so `claims.json` only asserts
+that its own summary line equals the sum of the rows under it.
 
 ### As a GitHub Action
 

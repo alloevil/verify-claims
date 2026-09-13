@@ -6,7 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from . import coverage, report, runner, schema
+from . import coverage, index_page, report, runner, schema
 from .checks import exit_code_for
 
 DEFAULT_FILES = (
@@ -113,6 +113,69 @@ def cmd_coverage(args, root: Path, path: Path, doc: dict) -> int:
     return 0
 
 
+def cmd_index(args, root: Path, path: Path, doc: dict) -> int:
+    """One page summarising every guarded repository, built from their own claims files."""
+    import datetime
+    import urllib.request
+
+    repos = list(args.repo or [])
+    list_file = Path(args.list_file) if args.list_file else root / "docs" / "repos.txt"
+    if not repos and list_file.exists():
+        repos = [ln.strip() for ln in list_file.read_text(encoding="utf-8").splitlines()
+                 if ln.strip() and not ln.startswith("#")]
+    if not repos:
+        print("no repositories: pass --repo owner/name or provide --list-file", file=sys.stderr)
+        return 2
+
+    def fetch(url: str) -> str:
+        with urllib.request.urlopen(url, timeout=30) as r:  # noqa: S310 - fixed https URL
+            return r.read().decode("utf-8")
+
+    rows = []
+    for repo in repos:
+        short = repo.split("/")[-1]
+        if args.path:
+            local = Path(args.path) / short
+            candidates = [local / "claims.json", local / "docs" / "claims.json",
+                          local / ".claims" / "claims.json", local / "dist" / "claims.json"]
+            source = next((str(c) for c in candidates if c.exists()), None)
+            if source is None:
+                rows.append(index_page.Row(short, repo, None, None, None, "-", "no local claims file"))
+                continue
+        else:
+            source = f"https://raw.githubusercontent.com/{repo}/{args.ref}/claims.json"
+        try:
+            if args.path:
+                doc_j = index_page.read_claims(source, fetch=fetch)
+            else:
+                doc_j = None
+                last = None
+                for rel in ("claims.json", "docs/claims.json", ".claims/claims.json",
+                            "dist/claims.json"):
+                    url = f"https://raw.githubusercontent.com/{repo}/{args.ref}/{rel}"
+                    try:
+                        doc_j = index_page.read_claims(url, fetch=fetch)
+                        break
+                    except Exception as exc:  # try the next documented location
+                        last = exc
+                if doc_j is None:
+                    raise last if last else RuntimeError("no claims file found")
+        except Exception as exc:  # unreachable file, invalid JSON, network down
+            rows.append(index_page.Row(short, repo, None, None, None, "-", f"{type(exc).__name__}"))
+            continue
+        rows.append(index_page.row_for(repo, doc_j))
+
+    note = args.note or (f"read from local clones under `{args.path}`" if args.path
+                         else f"read from `raw.githubusercontent.com` at `{args.ref}`")
+    text = index_page.render(rows, datetime.date.today().isoformat(), note)
+    if args.out == "-":
+        print(text)
+    else:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out} · {len(text.splitlines())} lines")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="verify-claims",
@@ -135,6 +198,17 @@ def build_parser() -> argparse.ArgumentParser:
     cov.add_argument("--first-screen", type=int, default=None, metavar="LINES",
                      help="only consider the first N lines (what a reader sees first)")
     cov.add_argument("--max", type=int, default=25, help="how many uncovered numbers to list (0 = all)")
+
+    idx = sub.add_parser("index", help="render one page covering every guarded repository")
+    idx.add_argument("--repo", action="append", default=None,
+                     help="owner/name (repeatable); default: read the list from --list-file")
+    idx.add_argument("--list-file", default=None, help="one owner/name per line")
+    idx.add_argument("--ref", default="HEAD", help="git ref to fetch (default HEAD; pin a tag for a fixed page)")
+    idx.add_argument("--path", default=None,
+                     help="read each repository from <path>/<name> instead of the network")
+    idx.add_argument("--out", default="-", help="output file, or - for stdout")
+    idx.add_argument("--note", default=None,
+                     help="how this page was produced (defaults to a description of the source)")
 
     check = sub.add_parser("check", help="validate the shape only, run nothing")
     check.add_argument("--json", action="store_true", help="accepted for symmetry; output is text")
@@ -174,6 +248,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_list(args, root, path, doc)
     if command == "coverage":
         return cmd_coverage(args, root, path, doc)
+    if command == "index":
+        return cmd_index(args, root, path, doc)
     if command == "check":
         return cmd_check(args, root, path, doc)
     return cmd_run(args, root, path, doc)

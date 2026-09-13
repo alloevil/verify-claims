@@ -1,0 +1,25 @@
+# Repositories whose claims file this page summarises.
+# One owner/name per line; `verify-claims index` reads this list when no --repo is given.
+# Add a repository only once its claims.json exists and its CI runs the gate.
+alloevil/agents-with-receipts
+alloevil/dsv41-3d
+alloevil/proxy-evolution
+alloevil/weibo-chat-auto
+alloevil/agent-harness-evals
+alloevil/AI-Paper-Daily
+alloevil/agent-changelog
+alloevil/alloevil
+alloevil/llm-benchmarks-tracker
+alloevil/paired-eval
+alloevil/codeblast
+alloevil/foodmap
+alloevil/deepresearch-arms-lab
+alloevil/coding-agent-internals
+alloevil/agent-tool-benchmark
+alloevil/agent-engineering-book
+alloevil/dsh-xray
+alloevil/TabCraft
+alloevil/AgentXRay
+alloevil/github-discovery
+alloevil/verify-claims
+alloevil/alloevil.github.io
