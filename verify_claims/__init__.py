@@ -5,7 +5,7 @@ from .checks import CheckResult, evaluate, exit_code_for, summarise
 from .runner import run_claim, run_commands
 from .schema import DATE_FIELDS, validate_document
 
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 __all__ = [
     "CheckResult",
     "DATE_FIELDS",

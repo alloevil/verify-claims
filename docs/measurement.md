@@ -117,3 +117,32 @@ first thing that fails** — it is the cheapest version of the bug it is meant t
 - **`manual` is a to-do, not a resolution.** A claim no command can check is visible on every run,
   but it is not verified — the ≈300 machine-checked claims are the only ones this measurement can
   speak for.
+
+---
+
+## Coverage: how much was never claimed at all
+
+The audit above measures claims that exist. It cannot see figures nobody ever wrote down, and a
+gate is silent about exactly those. `verify-claims coverage` (added with `0.1.2`) reads a README's
+prose, extracts number-like tokens, and lists the ones no claim mentions.
+
+Run across the 22 repositories this tool guards, it reports **119 mentions covered by a claim,
+128 with no claim mentioning them** — a little under half in a naive reading. That figure is
+**not** a defect count and should not be quoted as one:
+
+- it is a **heuristic over prose**, and its own first two runs were wrong in ways that flattered the
+  tool: it matched the whole token (unit included), so `283 家` never matched a claim that says
+  `283`, and it treated CJK characters as word characters, which silently hid *every* number in a
+  Chinese README — a `0% covered` that was a regex artefact, not a finding;
+- many candidates are **not figures at all**: an example's `50MB`, an HTTP `503`, a `24 小时`
+  statement, a CSS `width="100%"`, an `img width="100%"`. Reviewing four repositories by hand, the
+  majority of candidates were of this kind;
+- numbers written as words (`seven platforms`, `七种日志格式`) are invisible to it in **both**
+  directions — they are neither claimed nor flagged, which is the one error that makes the
+  repository look better than it is;
+- it says nothing about whether a claimed number is **true**, which is `run`'s job alone.
+
+What it is good for: a triage list, ordered by where a reader looks first, for the repositories
+whose claims are thinnest. Two examples from that list — `weibo-chat-auto` (4 claims against a long
+README) and `llm-benchmarks-tracker` (17 claims, 14 unclaimed candidates) — are the honest next
+targets, not because the numbers are wrong but because nobody has ever recomputed them.

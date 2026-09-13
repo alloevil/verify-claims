@@ -24,21 +24,21 @@
     },
     {
       "id": "cli-subcommands",
-      "claim": "The CLI exposes run, check and list.",
-      "value": "3 subcommands",
+      "claim": "The CLI exposes run, check, list and coverage.",
+      "value": "4 subcommands",
       "metric": "subcommands listed by --help",
       "method": "argparse subparsers in verify_claims/cli.py",
       "repro": "python3 -m verify_claims --help",
       "evidence": "verify_claims/cli.py",
       "as_of": "2026-09-13",
       "check": {
-        "cmd": "python3 -m verify_claims --help; python3 -m verify_claims run --help",
+        "cmd": "python3 -m verify_claims --help; python3 -m verify_claims run --help; python3 -m verify_claims coverage --help",
         "expect": {
           "contains": [
             "run",
             "check",
             "list",
-            "strict"
+            "coverage"
           ]
         }
       }
@@ -120,7 +120,7 @@
     {
       "id": "test-count",
       "claim": "The test suite contains 25 tests.",
-      "value": "25",
+      "value": "30",
       "metric": "tests reported by the standard-library runner",
       "method": "unittest discovery over tests/",
       "repro": "python3 -m unittest discover -s tests -t .",
@@ -129,7 +129,7 @@
       "check": {
         "cmd": "python3 -m unittest discover -s tests -t . 2>&1 | grep -o '^Ran [0-9]* tests'",
         "expect": {
-          "equals": "Ran 25 tests"
+          "equals": "Ran 30 tests"
         }
       }
     },
@@ -165,6 +165,40 @@
           "regex": "^sums 16 553 98 33 131 \\| stated 16 553 98 33 131 \\| pct 24 \\| doc says 24%: True$"
         },
         "timeout": 60
+      }
+    },
+    {
+      "id": "coverage-is-a-report-not-a-gate",
+      "claim": "`coverage` lists the README numbers no claim mentions and always exits 0 — it is a to-do list, not a gate. Its own report on this README leads with the illustration numbers from the worked example, and the gate still passes.",
+      "value": "exit 0, candidates listed",
+      "metric": "exit code of `coverage`, and whether it prints candidates",
+      "method": "the command scans this README, prints every number no claim mentions, and returns 0; only `run` decides pass/fail",
+      "repro": "python3 -m verify_claims --root . coverage --max 3; echo exit=$?",
+      "evidence": "verify_claims/coverage.py",
+      "as_of": "2026-09-13",
+      "check": {
+        "cmd": "python3 -m verify_claims --root . coverage --max 3; echo exit=$?",
+        "expect": {
+          "contains": [
+            "283",
+            "exit=0"
+          ],
+          "regex": "unclaimed"
+        },
+        "timeout": 120
+      }
+    },
+    {
+      "id": "coverage-baseline",
+      "claim": "Across the 22 repositories this tool guards, `coverage` found 119 number-like mentions matched by a claim and 128 that no claim mentions — an upper bound on unclaimed work, not a defect count.",
+      "value": "119 covered / 128 unclaimed (heuristic)",
+      "metric": "unclaimed candidates reported by `coverage --max 0` over the 22 guarded repositories",
+      "method": "run 2026-09-13 against local clones of all 22 repositories, once for each; the figure moves as READMEs change and is dominated by numbers that are not figures at all (example sizes, HTTP codes, CSS percentages, and numbers written as words, which the scan cannot see in either direction)",
+      "repro": "for d in <the 22 clones>; do python3 -m verify_claims --root ../$d coverage --max 0; done",
+      "evidence": "docs/measurement.md#coverage-how-much-was-never-claimed-at-all",
+      "as_of": "2026-09-13",
+      "check": {
+        "manual": "Needs a sibling checkout of all 22 guarded repositories, so it cannot run in this repository's CI. Re-run the loop in `repro` and update the figure here and in docs/measurement.md together; the number is a heuristic backlog, and the document says so."
       }
     }
   ]

@@ -6,7 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from . import report, runner, schema
+from . import coverage, report, runner, schema
 from .checks import exit_code_for
 
 DEFAULT_FILES = (
@@ -85,6 +85,34 @@ def cmd_run(args, root: Path, path: Path, doc: dict) -> int:
     return exit_code_for(results, args.strict)
 
 
+def cmd_coverage(args, root: Path, path: Path, doc: dict) -> int:
+    """Which published numbers no claim covers — a to-do list, not a verdict."""
+    readmes = [Path(r) for r in (args.readme or [])] or [r for r in (root / n for n in coverage.SCOPE) if r.exists()]
+    if not readmes:
+        print(f"no README found under {root} (looked for {', '.join(coverage.SCOPE)})", file=sys.stderr)
+        return 2
+    claims = doc.get("claims", [])
+    total = len(claims)
+    machine = sum(1 for c in claims if "manual" not in (c.get("check") or {}))
+    print(f"coverage · {doc.get('project') or root.name} · {path}")
+    print(f"  claims: {total} ({machine} machine-checked, {total - machine} manual)")
+    grand_c = grand_u = 0
+    for readme in readmes:
+        covered, uncovered = coverage.report(readme, claims, args.first_screen)
+        grand_c += len(covered)
+        grand_u += len(uncovered)
+        pct = round(100 * len(covered) / max(1, len(covered) + len(uncovered)))
+        print(f"  {readme.name}: {len(covered)} covered · {len(uncovered)} unclaimed ({pct}% covered)")
+        shown = uncovered if args.max == 0 else uncovered[: args.max]
+        for m in shown:
+            print(f"    L{m.line:<4} {m.number:<14} {m.text}")
+        if args.max and len(uncovered) > args.max:
+            print(f"    … {len(uncovered) - args.max} more")
+    pct = round(100 * grand_c / max(1, grand_c + grand_u))
+    print(f"  total: {grand_c} covered · {grand_u} unclaimed ({pct}% covered) — candidates, not verdicts")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="verify-claims",
@@ -100,6 +128,13 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--timeout", type=float, default=runner.DEFAULT_TIMEOUT, help="per-command timeout in seconds")
     run.add_argument("--only", default=None, help="comma-separated claim ids to run")
     run.add_argument("--skip", default=None, help="comma-separated claim ids to skip")
+
+    cov = sub.add_parser("coverage", help="report which numbers in the README nothing claims")
+    cov.add_argument("--readme", action="append", default=None,
+                     help="README to scan (repeatable; default: the ones that exist)")
+    cov.add_argument("--first-screen", type=int, default=None, metavar="LINES",
+                     help="only consider the first N lines (what a reader sees first)")
+    cov.add_argument("--max", type=int, default=25, help="how many uncovered numbers to list (0 = all)")
 
     check = sub.add_parser("check", help="validate the shape only, run nothing")
     check.add_argument("--json", action="store_true", help="accepted for symmetry; output is text")
@@ -137,6 +172,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if command == "list":
         return cmd_list(args, root, path, doc)
+    if command == "coverage":
+        return cmd_coverage(args, root, path, doc)
     if command == "check":
         return cmd_check(args, root, path, doc)
     return cmd_run(args, root, path, doc)

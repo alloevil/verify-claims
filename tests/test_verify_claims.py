@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from verify_claims import checks, runner, schema  # noqa: E402
+from verify_claims import checks, coverage, runner, schema  # noqa: E402
 from verify_claims.cli import main  # noqa: E402
 
 PY = sys.executable
@@ -229,6 +229,66 @@ class CliTest(unittest.TestCase):
     def test_missing_file_is_a_clean_error(self):
         with tempfile.TemporaryDirectory() as tmp:
             self.assertEqual(main(["--root", tmp, "run"]), 2)
+
+class CoverageTest(unittest.TestCase):
+    """The coverage report is a heuristic: it must never claim to be a verdict."""
+
+    def test_finds_number_like_tokens_and_ignores_code_fences(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            readme = Path(tmp) / "README.md"
+            readme.write_text(
+                "The tool checks 250 rows across 54 benchmarks.\n\n"
+                "```bash\nprintf 'not a claim: 999 rows'\n```\n"
+                "[link](https://example.invalid/123)\n",
+                encoding="utf-8",
+            )
+            found = {m.number for m in coverage.mentions(readme)}
+        self.assertIn("250 rows", found)
+        self.assertIn("54 benchmarks", found)
+        self.assertNotIn("999 rows", found)  # fenced code is an example, not a claim
+        self.assertNotIn("123", found)  # a URL is not a published figure
+
+    def test_chinese_units_count_as_published_numbers(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            readme = Path(tmp) / "README.zh-CN.md"
+            readme.write_text("覆盖 72 条宣称、18 个仓库。\n", encoding="utf-8")
+            found = {m.number for m in coverage.mentions(readme)}
+        self.assertIn("72 条", found)
+        self.assertIn("18 个", found)
+
+    def test_match_is_against_the_claims_text(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            readme = Path(tmp) / "README.md"
+            readme.write_text("It holds 250 rows and 9 evaluators.\n", encoding="utf-8")
+            claims = [{"claim": "250 result rows", "value": "250", "metric": "rows",
+                       "check": {"cmd": "printf 250"}}]
+            covered, uncovered = coverage.report(readme, claims)
+        self.assertEqual([m.number for m in covered], ["250 rows"])
+        self.assertEqual([m.number for m in uncovered], ["9 evaluators"])
+
+    def test_matching_ignores_the_unit_the_prose_carries(self):
+        # a claim states the number; the README wraps it in a sentence and a unit
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            readme = Path(tmp) / "README.md"
+            readme.write_text("已覆盖 283 家餐馆，共 6395 条记录。\n", encoding="utf-8")
+            claims = [{"claim": "283 restaurants", "value": "283"},
+                      {"claim": "record count", "value": "6,395"}]
+            covered, uncovered = coverage.report(readme, claims)
+        self.assertEqual(sorted(m.number for m in covered), ["283 家", "6395 条"])
+        self.assertEqual(uncovered, [])
+
+    def test_cli_prints_a_todo_list_not_a_verdict(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "README.md").write_text("Ships 12 widgets.\n", encoding="utf-8")
+            (root / "claims.json").write_text(json.dumps(document(claim())), encoding="utf-8")
+            code = main(["--root", str(root), "coverage"])
+        self.assertEqual(code, 0, "coverage is a report; it never fails the build")
 
 
 if __name__ == "__main__":

@@ -74,11 +74,42 @@ verify-claims --root . run
 
 verify-claims --root . list     # which claims are machine-checked, which are manual
 verify-claims --root . check    # shape only, runs nothing
+verify-claims --root . coverage # which numbers in the README nothing claims (a to-do list)
 ```
 
 Exit codes: **0** every machine check passed · **1** a claim no longer reproduces (or, with `--strict`, a claim has no machine check) · **2** the file's shape is invalid, so nothing was run.
 
 Options: `--strict` · `--json` · `--timeout` · `--only id1,id2` · `--skip id1` · `-f path/to/claims.json` (the default search order is `claims.json`, `docs/claims.json`, `.claims/claims.json`, `dist/claims.json`).
+
+### Coverage: what the gate cannot see
+
+A gate defends the numbers somebody wrote down. It is silent about the numbers nobody did — and
+"we gated our figures" is exactly the kind of statement that deserves a look. `coverage` reads the
+README's prose, pulls out number-like tokens (`42%`, `28/28`, `250 rows`, `72 条`), and prints the
+ones no claim mentions. It always exits **0**: it is a to-do list, not a gate.
+
+```bash
+verify-claims --root . coverage --max 10        # the ten most prominent unclaimed numbers
+verify-claims --root . coverage --first-screen 40   # only what a reader sees before scrolling
+```
+
+Read it as a heuristic, and read its blind spots first:
+
+- **Words are invisible.** "seven platforms" and "七种日志格式" carry no digits; the report cannot
+  see them either way.
+- **Not every number is a figure.** An example's `50MB`, an HTTP `503`, a `24 小时` uptime statement,
+  a CSS `width="100%"` all show up as candidates. This repository's own report leads with the three
+  illustration numbers from its worked example — `283 restaurants`, `312 visits`, `6,395 records` —
+  none of which should ever be claimed, because they describe another project's data.
+- **It says nothing about truth.** That is `run`'s job; coverage only knows whether a number was
+  claimed, not whether the claim holds.
+- **Fenced code, links, image tags and badge lines are skipped** — they are examples or furniture.
+  Table rows are *kept*: a generated table is still a published figure.
+
+So the output is an upper bound on the work left, ordered by where a reader looks, not a
+completeness score. Across the 22 repositories this tool guards it currently lists roughly one
+unclaimed candidate per claim — most of them the kind of decorative number above, which is why the
+number is reported as a backlog to be triaged rather than a defect count.
 
 ### As a GitHub Action
 
@@ -105,10 +136,15 @@ The gate never rewrites your text. It tells you which published number stopped b
 
 ## Releases
 
-`v0.1.0` · `v0.1.1` (a failed assertion now reports the command's actual output). Tags are the
+`v0.1.0` · `v0.1.1` (a failed assertion now reports the command's actual output) · `0.1.2` in the
+manifest, its tag held until a PyPI publisher exists (adds `coverage`). Tags are the
 release unit — consumers reference `alloevil/verify-claims@vX.Y.Z`; there is no floating tag on
 purpose, because a moving ref would mean a gate that changes without a commit in the repository
 it guards.
+
+Note on the first two tags: they predate the release workflow and their manifest was still `0.1.0`,
+which the workflow now refuses by design (tag ≠ manifest). `0.1.2` is the first version whose tag
+and manifest agree, and it is held until the PyPI pending publisher exists.
 
 Publishing runs from `.github/workflows/release.yml` on a version tag, through PyPI Trusted
 Publishing (OIDC), so no API token lives in this repository. The workflow refuses a tag that does

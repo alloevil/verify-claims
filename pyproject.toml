@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "verify-claims"
-version = "0.1.0"
+version = "0.1.2"
 description = "Run the receipts behind a claims.json file: every published number carries a command that must still reproduce it."
 readme = "README.md"
 requires-python = ">=3.9"
