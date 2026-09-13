@@ -115,6 +115,14 @@ class EvaluateTest(unittest.TestCase):
         self.assertEqual(checks.evaluate("line\n14 files\n", 0, {"regex": r"^\d+ files$"}), [])
         self.assertTrue(checks.evaluate("no count here", 0, {"regex": r"^\d+ files$"}))
 
+    def test_failures_carry_the_actual_output(self):
+        """A red CI run must be self-diagnosing: the message shows what the command printed."""
+        failures = checks.evaluate("tests=65 pass=62 fail=0\n", 0, {"contains": ["tests=70"]})
+        self.assertEqual(len(failures), 1)
+        self.assertIn("tests=65", failures[0])
+        empty = checks.evaluate("", 1, {"exit_code": 0})
+        self.assertIn("(empty)", empty[0])
+
     def test_expected_nonzero_exit_code(self):
         self.assertEqual(checks.evaluate("", 1, {"exit_code": 1}), [])
         self.assertTrue(checks.evaluate("", 0, {"exit_code": 1}))

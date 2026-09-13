@@ -119,8 +119,8 @@
     },
     {
       "id": "test-count",
-      "claim": "The test suite contains 24 tests.",
-      "value": "24",
+      "claim": "The test suite contains 25 tests.",
+      "value": "25",
       "metric": "tests reported by the standard-library runner",
       "method": "unittest discovery over tests/",
       "repro": "python3 -m unittest discover -s tests -t .",
@@ -129,7 +129,7 @@
       "check": {
         "cmd": "python3 -m unittest discover -s tests -t . 2>&1 | grep -o '^Ran [0-9]* tests'",
         "expect": {
-          "equals": "Ran 24 tests"
+          "equals": "Ran 25 tests"
         }
       }
     },
