@@ -191,13 +191,13 @@
     },
     {
       "id": "coverage-baseline",
-      "claim": "Across the 22 repositories this tool guards, `coverage` found 119 number-like mentions matched by a claim and 128 that no claim mentions — an upper bound on unclaimed work, not a defect count.",
-      "value": "119 covered / 128 unclaimed (heuristic)",
+      "claim": "Across the 22 repositories this tool guards, `coverage` found 176 number-like mentions matched by a claim and 78 that no claim mentions — an upper bound on unclaimed work, not a defect count.",
+      "value": "176 covered / 78 unclaimed (heuristic)",
       "metric": "unclaimed candidates reported by `coverage --max 0` over the 22 guarded repositories",
-      "method": "run 2026-09-13 against local clones of all 22 repositories, once for each; the figure moves as READMEs change and is dominated by numbers that are not figures at all (example sizes, HTTP codes, CSS percentages, and numbers written as words, which the scan cannot see in either direction)",
+      "method": "run 2026-09-14 against local clones of all 22 repositories, once for each; the figure moves as READMEs and claims change, and the remaining candidates are dominated by numbers that are not figures at all (example sizes, HTTP codes, CSS percentages, dates) plus numbers written as words, which the scan cannot see in either direction",
       "repro": "for d in <the 22 clones>; do python3 -m verify_claims --root ../$d coverage --max 0; done",
       "evidence": "docs/measurement.md#coverage-how-much-was-never-claimed-at-all",
-      "as_of": "2026-09-13",
+      "as_of": "2026-09-14",
       "check": {
         "manual": "Needs a sibling checkout of all 22 guarded repositories, so it cannot run in this repository's CI. Re-run the loop in `repro` and update the figure here and in docs/measurement.md together; the number is a heuristic backlog, and the document says so."
       }

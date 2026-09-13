@@ -108,9 +108,9 @@ Read it as a heuristic, and read its blind spots first:
   Table rows are *kept*: a generated table is still a published figure.
 
 So the output is an upper bound on the work left, ordered by where a reader looks, not a
-completeness score. Across the 22 repositories this tool guards it currently lists roughly one
-unclaimed candidate per claim — most of them the kind of decorative number above, which is why the
-number is reported as a backlog to be triaged rather than a defect count.
+completeness score. Across the 22 repositories this tool guards it currently lists 78 unclaimed
+candidates against 176 claimed ones; most of the 78 are the decorative kind above, which is why this
+is a backlog to be triaged rather than a defect count.
 
 ### The portfolio page
 

@@ -126,9 +126,11 @@ The audit above measures claims that exist. It cannot see figures nobody ever wr
 gate is silent about exactly those. `verify-claims coverage` (added with `0.1.2`) reads a README's
 prose, extracts number-like tokens, and lists the ones no claim mentions.
 
-Run across the 22 repositories this tool guards, it reports **119 mentions covered by a claim,
-128 with no claim mentioning them** — a little under half in a naive reading. That figure is
-**not** a defect count and should not be quoted as one:
+Run across the 22 repositories this tool guards on 2026-09-14, it reports **176 mentions covered by
+a claim and 78 with none** (69% covered). The 48% it reported a day earlier was not a change in the
+repositories' honesty but in the claims: converting manual claims to snapshot-backed ones put the
+figures those claims describe into the checkable text for the first time. The figure is **not** a
+defect count and should not be quoted as one:
 
 - it is a **heuristic over prose**, and its own first two runs were wrong in ways that flattered the
   tool: it matched the whole token (unit included), so `283 家` never matched a claim that says
@@ -143,6 +145,9 @@ Run across the 22 repositories this tool guards, it reports **119 mentions cover
 - it says nothing about whether a claimed number is **true**, which is `run`'s job alone.
 
 What it is good for: a triage list, ordered by where a reader looks first, for the repositories
-whose claims are thinnest. Two examples from that list — `weibo-chat-auto` (4 claims against a long
-README) and `llm-benchmarks-tracker` (17 claims, 14 unclaimed candidates) — are the honest next
-targets, not because the numbers are wrong but because nobody has ever recomputed them.
+whose claims are thinnest. Acting on the first version of that list is what took the portfolio from
+48% to 69%: `foodmap`, `weibo-chat-auto` and `github-discovery` each had a handful of claims against
+a README full of figures, and each gained the receipts that made sense — machine checks where the
+data is committed, manual entries naming the missing artifact where it is not. The remaining 78
+candidates are mostly the decorative kind above; the honest next target is not the count but the
+individual number that turns out to be a real figure with nothing behind it.
