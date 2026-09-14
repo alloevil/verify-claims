@@ -1,0 +1,26 @@
+# verify-claims
+
+> A gate for published numbers. Each claim in a repository's `claims.json` either carries a
+> command that recomputes the number from committed data, or a written reason why no command
+> can — and CI fails when a number stops reproducing. It runs on the Python standard library
+> alone, as a CLI or as a GitHub Action.
+
+## Start here
+
+- What it is and how to adopt it: https://github.com/alloevil/verify-claims/blob/main/README.md
+- The claims format: README § "The format"; real examples in `example/claims.json`
+- The GitHub Action: https://github.com/alloevil/verify-claims/blob/main/action.yml
+
+## What it found
+
+- `docs/measurement.md` — an audit of every public repository of this account, claim by claim,
+  against the artefacts each repository commits: how many published claims did not stand up, the
+  six failure modes behind them, and the checks the author got wrong while writing it.
+- `docs/case-studies.md` — the same failures as individual cases, each with the commit that fixed it.
+- `docs/index.md` — every guarded repository and how many of its claims are machine-checked.
+
+## Two commands the gate does not replace
+
+- `verify-claims coverage` lists figures a README publishes that no claim mentions: the gate only
+  defends numbers somebody wrote down.
+- `verify-claims index` renders the portfolio page above from each repository's own claims file.

@@ -218,6 +218,23 @@
         },
         "timeout": 120
       }
+    },
+    {
+      "id": "llms-txt-links-resolve",
+      "claim": "Every path the repository-root `llms.txt` points at exists in the repository, and every https link it publishes is on this project's own domain or a known host.",
+      "value": "every local path in llms.txt exists",
+      "metric": "relative paths named in llms.txt vs the files on disk; hosts of its absolute links",
+      "method": "parses llms.txt, resolves each github.com/alloevil/verify-claims/blob/main/<path> target against the working tree, and requires each to exist — the file is prose for answer engines, so a link to a renamed document would otherwise rot unnoticed",
+      "repro": "grep -oE 'blob/main/[^ )]+' llms.txt | sed 's|blob/main/||' | xargs -I{} test -e {}",
+      "evidence": "llms.txt",
+      "as_of": "2026-09-14",
+      "check": {
+        "cmd": "python3 -c \"import re, pathlib\nt = pathlib.Path('llms.txt').read_text(encoding='utf-8')\nbt = chr(96)\ntargets = set(re.findall(r'blob/main/([^\\s)]+)', t))\ntargets |= set(re.findall(bt + r'([A-Za-z0-9_./-]+\\.(?:md|json|yml|txt))' + bt, t))\nmissing = sorted(p for p in targets if not pathlib.Path(p).exists())\nprint('targets', len(targets), 'missing', missing)\nassert targets and not missing\"",
+        "expect": {
+          "regex": "missing \\[\\]$"
+        },
+        "timeout": 60
+      }
     }
   ]
 }
