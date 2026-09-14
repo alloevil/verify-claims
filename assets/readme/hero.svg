@@ -16,14 +16,14 @@
     </g>
 
     <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18">
-      <rect x="0" y="228" width="120" height="38" rx="9" fill="#141B23" stroke="#26313C"/>
-      <text x="16" y="253" fill="#C9D1D9">claims.json</text>
-      <rect x="134" y="228" width="106" height="38" rx="9" fill="#141B23" stroke="#26313C"/>
-      <text x="150" y="253" fill="#C9D1D9">check.cmd</text>
-      <rect x="254" y="228" width="120" height="38" rx="9" fill="#0E1B12" stroke="#2B5A38"/>
-      <text x="270" y="253" fill="#3FB950">expect</text>
-      <rect x="388" y="228" width="92" height="38" rx="9" fill="#141B23" stroke="#26313C"/>
-      <text x="404" y="253" fill="#C9D1D9">as_of</text>
+      <g id="chip-claim"><rect x="0" y="228" width="120" height="38" rx="9" fill="#141B23" stroke="#26313C"/>
+      <text x="16" y="253" fill="#C9D1D9">claims.json</text></g>
+      <g id="chip-check"><rect x="134" y="228" width="106" height="38" rx="9" fill="#141B23" stroke="#26313C"/>
+      <text x="150" y="253" fill="#C9D1D9">check.cmd</text></g>
+      <g id="chip-expect"><rect x="254" y="228" width="120" height="38" rx="9" fill="#0E1B12" stroke="#2B5A38"/>
+      <text x="270" y="253" fill="#3FB950">expect</text></g>
+      <g id="chip-asof"><rect x="388" y="228" width="92" height="38" rx="9" fill="#141B23" stroke="#26313C"/>
+      <text x="404" y="253" fill="#C9D1D9">as_of</text></g>
     </g>
 
     <text x="0" y="308" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="19" fill="#8B949E">A number with no command that reproduces it is a rumour.</text>
@@ -49,4 +49,18 @@
     <text x="644" y="320" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#8B949E">a drifted number instead prints</text>
     <text x="644" y="346" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#F85149">expected '283312', got '284312'</text>
   </g>
+
+  <style>
+    /* 四条收据依次亮起，然后 expect 那一格闪一下 —— 就是"命令打印出同一个数"的那一刻。
+       reduced-motion 下全部静止且完全可见。 */
+    @keyframes chipLit { 0%, 100% { opacity: .5 } 8% { opacity: 1 } 28% { opacity: .5 } }
+    @keyframes matchFlash { 0%, 62% { opacity: .55 } 72%, 90% { opacity: 1 } 100% { opacity: .55 } }
+    #chip-claim  { animation: chipLit 6s ease-in-out infinite; animation-delay: 0s; }
+    #chip-check  { animation: chipLit 6s ease-in-out infinite; animation-delay: 0.8s; }
+    #chip-expect { animation: matchFlash 6s ease-in-out infinite; animation-delay: 1.6s; }
+    #chip-asof   { animation: chipLit 6s ease-in-out infinite; animation-delay: 2.4s; }
+    @media (prefers-reduced-motion: reduce) {
+      #chip-claim, #chip-check, #chip-expect, #chip-asof { animation: none; opacity: 1; }
+    }
+  </style>
 </svg>
