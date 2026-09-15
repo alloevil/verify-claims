@@ -6,16 +6,16 @@
   <rect x="0.5" y="0.5" width="1199" height="419" rx="18" fill="none" stroke="#1B232C"/>
 
   <g id="identity" transform="translate(56 44)">
-    <text x="0" y="0" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" letter-spacing="2" fill="#8B949E">MIT &#183; PYTHON 3.9+ &#183; NO DEPENDENCIES</text>
-    <text x="0" y="86" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="72" font-weight="700" fill="#E6EDF3">verify-claims</text>
+    <text x="0" y="0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="18" letter-spacing="2" fill="#8B949E">MIT &#183; PYTHON 3.9+ &#183; NO DEPENDENCIES</text>
+    <text x="0" y="86" font-family="Helvetica Neue, Helvetica, Arial, 'Liberation Sans', sans-serif" font-size="72" font-weight="700" fill="#E6EDF3">verify-claims</text>
 
-    <g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="21" fill="#C9D1D9">
+    <g font-family="Helvetica Neue, Helvetica, Arial, 'Liberation Sans', sans-serif" font-size="21" fill="#C9D1D9">
       <text x="0" y="140">Runs the receipts behind a claims.json file:</text>
       <text x="0" y="170">every published number must still be printed by</text>
       <text x="0" y="200">the command next to it.</text>
     </g>
 
-    <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18">
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="18">
       <g id="chip-claim"><rect x="0" y="228" width="120" height="38" rx="9" fill="#141B23" stroke="#26313C"/>
       <text x="16" y="253" fill="#C9D1D9">claims.json</text></g>
       <g id="chip-check"><rect x="134" y="228" width="106" height="38" rx="9" fill="#141B23" stroke="#26313C"/>
@@ -26,16 +26,16 @@
       <text x="404" y="253" fill="#C9D1D9">as_of</text></g>
     </g>
 
-    <text x="0" y="308" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="19" fill="#8B949E">A number with no command that reproduces it is a rumour.</text>
-    <text x="0" y="342" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#8B949E">this repository's own gate: 7 machine-checked &#183; 7 ok</text>
+    <text x="0" y="308" font-family="Helvetica Neue, Helvetica, Arial, 'Liberation Sans', sans-serif" font-size="19" fill="#8B949E">A number with no command that reproduces it is a rumour.</text>
+    <text x="0" y="342" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="18" fill="#8B949E">this repository's own gate: 7 machine-checked &#183; 7 ok</text>
   </g>
 
   <g id="run-panel">
     <rect x="620" y="44" width="524" height="328" rx="16" fill="#141B23" stroke="#26313C" stroke-width="1.5"/>
 
-    <text x="644" y="80" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#8B949E">$ verify-claims --root . run</text>
+    <text x="644" y="80" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="18" fill="#8B949E">$ verify-claims --root . run</text>
 
-    <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C9D1D9">
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="18" fill="#C9D1D9">
       <text x="644" y="118"><tspan fill="#3FB950">ok</tspan>   zero-dependencies</text>
       <text x="644" y="146"><tspan fill="#3FB950">ok</tspan>   example-passes</text>
       <text x="644" y="174"><tspan fill="#3FB950">ok</tspan>   strict-mode-bites</text>
@@ -44,16 +44,14 @@
 
     <line x1="644" y1="228" x2="1120" y2="228" stroke="#26313C"/>
 
-    <text x="644" y="258" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#C9D1D9">7 machine-checked &#183; 7 ok &#183; 0 failed &#183; 0 manual</text>
-    <text x="644" y="286" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#3FB950">passed &#8212; every published number reproduced.</text>
-    <text x="644" y="320" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#8B949E">a drifted number instead prints</text>
-    <text x="644" y="346" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#F85149">expected '283312', got '284312'</text>
+    <text x="644" y="258" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="18" fill="#C9D1D9">7 machine-checked &#183; 7 ok &#183; 0 failed &#183; 0 manual</text>
+    <text x="644" y="286" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="18" fill="#3FB950">passed &#8212; every published number reproduced.</text>
+    <text x="644" y="320" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="18" fill="#8B949E">a drifted number instead prints</text>
+    <text x="644" y="346" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="18" fill="#F85149">expected '283312', got '284312'</text>
   </g>
 
     <style>
-    /* 四条收据依次亮起，绿色的 expect 在“命令打印出同一个数”那一刻亮得最久。
-       幅度：透明度 .22 → 1 且上移（位置变化比透明度可感得多）。
-       reduced-motion 下全部静止、全部完全可见。 */
+    /* A local, strong change: the outline goes from dark grey to the accent colour. Far easier to notice than a whole block fading. */
     @keyframes chipLit {
       0%       { opacity: .15; transform: translateY(0) scale(1); }
       6%, 40%  { opacity: 1;   transform: translateY(-14px) scale(1.05); }
@@ -72,7 +70,8 @@
     #chip-check { animation: chipLit 5s ease-in-out infinite; animation-delay: 0.9s; }
     #chip-expect { animation: matchFlash 5s ease-in-out infinite; animation-delay: 1.8s; }
     #chip-asof { animation: chipLit 5s ease-in-out infinite; animation-delay: 2.7s; }
-    /* 亮起时描边从暗灰变亮蓝：一次局部强变化（通道差 >150），比整块半透明更容易被看到。 */
+    /* A local, strong change: the outline goes from dark grey to the accent colour. Far easier
+       to notice than a whole block fading. */
     @keyframes borderGlow {
       0%       { stroke: #26313C; }
       6%, 40%  { stroke: #00ccff; }
@@ -94,24 +93,5 @@
     }
   </style>
 
-  <g id="packet-layer">
-    <circle id="packet" cx="56" cy="291" r="7" fill="#58A6FF" fill-opacity="0.9"/>
-    <circle id="packet-halo" cx="56" cy="291" r="14" fill="#58A6FF" fill-opacity="0.18"/>
-  </g>
 
-  <style>
-    /* 一个光点沿管线走过：位移跨越大半个画幅，这是眼睛余光能捕捉到的那类运动。
-       它只做引导，不承载信息 —— reduced-motion 下不显示。 */
-    @keyframes packetRun {
-      0%   { transform: translateX(0); opacity: 0; }
-      8%   { opacity: 1; }
-      92%  { opacity: 1; }
-      100% { transform: translateX(480px); opacity: 0; }
-    }
-    #packet { animation: packetRun 5s linear infinite; }
-    #packet-halo { animation: packetRun 5s linear infinite; }
-    @media (prefers-reduced-motion: reduce) {
-      #packet { display: none; }
-    }
-  </style>
 </svg>
