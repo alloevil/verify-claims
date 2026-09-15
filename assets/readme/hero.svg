@@ -50,17 +50,68 @@
     <text x="644" y="346" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#F85149">expected '283312', got '284312'</text>
   </g>
 
-  <style>
-    /* 四条收据依次亮起，然后 expect 那一格闪一下 —— 就是"命令打印出同一个数"的那一刻。
-       reduced-motion 下全部静止且完全可见。 */
-    @keyframes chipLit { 0%, 100% { opacity: .5 } 8% { opacity: 1 } 28% { opacity: .5 } }
-    @keyframes matchFlash { 0%, 62% { opacity: .55 } 72%, 90% { opacity: 1 } 100% { opacity: .55 } }
-    #chip-claim  { animation: chipLit 6s ease-in-out infinite; animation-delay: 0s; }
-    #chip-check  { animation: chipLit 6s ease-in-out infinite; animation-delay: 0.8s; }
-    #chip-expect { animation: matchFlash 6s ease-in-out infinite; animation-delay: 1.6s; }
-    #chip-asof   { animation: chipLit 6s ease-in-out infinite; animation-delay: 2.4s; }
+    <style>
+    /* 四条收据依次亮起，绿色的 expect 在“命令打印出同一个数”那一刻亮得最久。
+       幅度：透明度 .22 → 1 且上移（位置变化比透明度可感得多）。
+       reduced-motion 下全部静止、全部完全可见。 */
+    @keyframes chipLit {
+      0%       { opacity: .15; transform: translateY(0) scale(1); }
+      6%, 40%  { opacity: 1;   transform: translateY(-14px) scale(1.05); }
+      52%      { opacity: .15; transform: translateY(0) scale(1); }
+      100%     { opacity: .15; transform: translateY(0) scale(1); }
+    }
+    }
+    @keyframes matchFlash {
+      0%       { opacity: .2; transform: translateY(0) scale(1); }
+      30%, 80% { opacity: 1;  transform: translateY(-16px) scale(1.06); }
+      92%      { opacity: .2; transform: translateY(0) scale(1); }
+      100%     { opacity: .2; transform: translateY(0) scale(1); }
+    }
+    }
+    #chip-claim { animation: chipLit 5s ease-in-out infinite; animation-delay: 0s; }
+    #chip-check { animation: chipLit 5s ease-in-out infinite; animation-delay: 0.9s; }
+    #chip-expect { animation: matchFlash 5s ease-in-out infinite; animation-delay: 1.8s; }
+    #chip-asof { animation: chipLit 5s ease-in-out infinite; animation-delay: 2.7s; }
+    /* 亮起时描边从暗灰变亮蓝：一次局部强变化（通道差 >150），比整块半透明更容易被看到。 */
+    @keyframes borderGlow {
+      0%       { stroke: #26313C; }
+      6%, 40%  { stroke: #00ccff; }
+      52%      { stroke: #26313C; }
+      100%     { stroke: #26313C; }
+    }
+    }
+    #chip-claim rect { animation: borderGlow 5s ease-in-out infinite; animation-delay: 0.0s; }
+    #chip-check rect { animation: borderGlow 5s ease-in-out infinite; animation-delay: 1.25s; }
+    #chip-expect rect { animation: borderGlow 5s ease-in-out infinite; animation-delay: 3.0s; }
+    #chip-asof rect { animation: borderGlow 5s ease-in-out infinite; animation-delay: 3.75s; }
     @media (prefers-reduced-motion: reduce) {
-      #chip-claim, #chip-check, #chip-expect, #chip-asof { animation: none; opacity: 1; }
+      #chip-claim, #chip-check, #chip-expect, #chip-asof, #chip-claim rect, #chip-check rect, #chip-expect rect, #chip-asof rect { animation: none; opacity: 1; transform: none; }
+    }
+      #chip-claim, #chip-check, #chip-expect, #chip-asof,
+    #step-releases, #step-parse, #step-data, #step-pages,
+    #stage-collection, #stage-filtering, #stage-persistence, #stage-weekly {
+      transform-box: fill-box; transform-origin: center;
+    }
+  </style>
+
+  <g id="packet-layer">
+    <circle id="packet" cx="56" cy="291" r="7" fill="#58A6FF" fill-opacity="0.9"/>
+    <circle id="packet-halo" cx="56" cy="291" r="14" fill="#58A6FF" fill-opacity="0.18"/>
+  </g>
+
+  <style>
+    /* 一个光点沿管线走过：位移跨越大半个画幅，这是眼睛余光能捕捉到的那类运动。
+       它只做引导，不承载信息 —— reduced-motion 下不显示。 */
+    @keyframes packetRun {
+      0%   { transform: translateX(0); opacity: 0; }
+      8%   { opacity: 1; }
+      92%  { opacity: 1; }
+      100% { transform: translateX(480px); opacity: 0; }
+    }
+    #packet { animation: packetRun 5s linear infinite; }
+    #packet-halo { animation: packetRun 5s linear infinite; }
+    @media (prefers-reduced-motion: reduce) {
+      #packet { display: none; }
     }
   </style>
 </svg>
