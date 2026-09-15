@@ -1,7 +1,7 @@
 # verify-claims
 
 <p align="center">
-  <img src="./assets/readme/hero.svg" width="100%" alt="verify-claims — runs the receipts behind a claims.json file: every published number must still be printed by the command next to it. The panel shows this repository's own run: 7 machine-checked, 7 ok.">
+  <img src="./assets/readme/hero.svg?v=20260915" width="100%" alt="verify-claims — runs the receipts behind a claims.json file: every published number must still be printed by the command next to it. The panel shows this repository's own run: 7 machine-checked, 7 ok.">
 </p>
 
 <p align="center">
