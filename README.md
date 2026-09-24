@@ -82,6 +82,20 @@ Exit codes: **0** every machine check passed · **1** a claim no longer reproduc
 
 Options: `--strict` · `--json` · `--timeout` · `--only id1,id2` · `--skip id1` · `-f path/to/claims.json` (the default search order is `claims.json`, `docs/claims.json`, `.claims/claims.json`, `dist/claims.json`).
 
+### Linting for time-bomb claims
+
+`lint` is an advisory scan for machine-checked claims whose values look like changing counts or
+current data. It deliberately does not fail CI: versions, protocol constants, dated snapshots, and
+relation checks are legitimate fixed values. The output is a review queue, not a verdict.
+
+```bash
+verify-claims --root . lint
+```
+
+Replace a flagged absolute count with a relation check (`card == data`, `sitemap == generated pages`)
+or attach a dated snapshot. The linter intentionally has false positives; a human decides whether
+the value is stable or whether the claim should be rewritten.
+
 ### Coverage: what the gate cannot see
 
 A gate defends the numbers somebody wrote down. It is silent about the numbers nobody did — and
