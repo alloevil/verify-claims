@@ -6,7 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from . import coverage, index_page, report, runner, schema
+from . import coverage, index_page, lint, report, runner, schema
 from .checks import exit_code_for
 
 DEFAULT_FILES = (
@@ -192,6 +192,9 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--only", default=None, help="comma-separated claim ids to run")
     run.add_argument("--skip", default=None, help="comma-separated claim ids to skip")
 
+    lintp = sub.add_parser("lint", help="advisory scan for numeric claims that may rot as data grows")
+    lintp.add_argument("--json", action="store_true", help="accepted for symmetry; output is text")
+
     cov = sub.add_parser("coverage", help="report which numbers in the README nothing claims")
     cov.add_argument("--readme", action="append", default=None,
                      help="README to scan (repeatable; default: the ones that exist)")
@@ -246,6 +249,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if command == "list":
         return cmd_list(args, root, path, doc)
+    if command == "lint":
+        findings = lint.lint(doc.get("claims", []))
+        print(lint.render(findings))
+        return 0
     if command == "coverage":
         return cmd_coverage(args, root, path, doc)
     if command == "index":

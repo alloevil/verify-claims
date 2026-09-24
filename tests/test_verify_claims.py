@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from verify_claims import checks, coverage, index_page, runner, schema  # noqa: E402
+from verify_claims import checks, coverage, index_page, lint, runner, schema  # noqa: E402
 from verify_claims.cli import main  # noqa: E402
 
 PY = sys.executable
@@ -229,6 +229,20 @@ class CliTest(unittest.TestCase):
     def test_missing_file_is_a_clean_error(self):
         with tempfile.TemporaryDirectory() as tmp:
             self.assertEqual(main(["--root", tmp, "run"]), 2)
+
+class LintTest(unittest.TestCase):
+    def test_flags_a_dynamic_count_without_relation_words(self):
+        findings = lint.lint([claim(id="count", value="168 releases", claim="The site has 168 releases", method="data")])
+        self.assertEqual([f.claim_id for f in findings], ["count"])
+
+    def test_does_not_flag_a_relation_check(self):
+        findings = lint.lint([claim(id="relation", value="counter == data", claim="card equals the data count", method="recompute from data")])
+        self.assertEqual(findings, [])
+
+    def test_manual_claims_are_left_for_humans(self):
+        findings = lint.lint([claim(check={"manual": "the API needs a key"}, value="168 releases")])
+        self.assertEqual(findings, [])
+
 
 class CoverageTest(unittest.TestCase):
     """The coverage report is a heuristic: it must never claim to be a verdict."""
